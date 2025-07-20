@@ -1,6 +1,7 @@
 import os
-from config import CHUNK_SIZE, CHUNK_DIR, RECONSTRUCTED_DIR, FILENAME_PREFIX, HASH_ALGO, NODES
 import hashlib
+from config import CHUNK_SIZE, CHUNK_DIR, RECONSTRUCTED_DIR, FILENAME_PREFIX, HASH_ALGO, NODES, REPLICATION_FACTOR
+from utils import select_random_replicas
 
 def hash_chunk(data):
     h = hashlib.new(HASH_ALGO)
@@ -19,20 +20,40 @@ def chunk_file(file_path, chunk_size=CHUNK_SIZE):
         with open(file_path, 'rb') as f:
             chunk_index = 0
             while True:
-                output_dir = os.path.join(CHUNK_DIR, NODES[chunk_index % len(NODES)], name_wo_ext)  # TODO: Add node-specific directories
+                # Creating/Opening node specific directories
+                primary_node =  NODES[chunk_index % len(NODES)] # Could chose primary node based on distance from the source or other criteria...
+                output_dir = os.path.join(CHUNK_DIR, primary_node, name_wo_ext)  # TODO: Add node-specific directories
                 os.makedirs(output_dir, exist_ok=True)
+                
                 chunk = f.read(chunk_size)
                 if not chunk:
                     break
-
                 chunk_hash = hash_chunk(chunk)
                 chunk_filename = f"{FILENAME_PREFIX}{chunk_index:04d}.bin"
                 chunk_path = os.path.join(output_dir, chunk_filename)   # TODO: Make other logics on how the data is distributed across nodes.
                 relative_path = os.path.relpath(chunk_path, CHUNK_DIR)
 
+                # Writing the chunk to the primary node...
                 with open(chunk_path, 'wb') as chunk_file:
                     chunk_file.write(chunk)
 
+                # Replicating the chunk to other nodes
+                replicas = []
+                replicas_nodes = select_random_replicas(NODES, primary_node, REPLICATION_FACTOR)
+                for replica_node in replicas_nodes:
+                    replica_dir = os.path.join(CHUNK_DIR, replica_node, f'{name_wo_ext}_replica')
+                    os.makedirs(replica_dir, exist_ok=True)
+                    replica_path = os.path.join(replica_dir, chunk_filename)
+
+                    with open(replica_path, 'wb') as replica_file:
+                        replica_file.write(chunk)
+
+                    replicas.append({
+                        "node": replica_node,
+                        "replica_path": replica_path,
+                    })
+
+                # Adding metadata for the chunk
                 meta_data.append({
                     "chunk_index": chunk_index,
                     "chunk_filename": chunk_filename,
@@ -41,6 +62,7 @@ def chunk_file(file_path, chunk_size=CHUNK_SIZE):
                     "node": NODES[chunk_index % len(NODES)],
                     "chunk_size": len(chunk),
                     "chunk_hash": chunk_hash,
+                    "replicas": replicas,
                 })      # TODO: Add timestamp and other metadata for better tracking and future scaling and versioning. Could also add node id for distributed systems.
 
                 print(f"[INFO-LOG] Created chunk: {chunk_filename} with hash: {chunk_hash}")
@@ -59,5 +81,5 @@ def chunk_file(file_path, chunk_size=CHUNK_SIZE):
         raise e
 
 
-# chunk_file('sample_files/testing.txt')  # Example usage, replace with actual file path
+chunk_file('sample_files/testing.txt')  # Example usage, replace with actual file path
 

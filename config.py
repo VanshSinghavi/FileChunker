@@ -11,6 +11,7 @@ CHUNK_DIR = config.get("chunk_dir", "chunks")
 RECONSTRUCTED_DIR = config.get("reconstructed_dir", "reconstructed")
 FILENAME_PREFIX = config.get("filename_prefix", "chunk_")
 HASH_ALGO = config.get("hash_algorithm", "sha256")
+REPLICATION_FACTOR = config.get("replication_factor", 2)
 
 os.makedirs(CHUNK_DIR, exist_ok=True)
 os.makedirs(RECONSTRUCTED_DIR, exist_ok=True)

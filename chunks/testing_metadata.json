@@ -6,7 +6,13 @@
         "chunk_path": "chunks\\node1\\testing\\chunk_0000.bin",
         "node": "node1",
         "chunk_size": 1024,
-        "chunk_hash": "71c8fe2f6f116f289f3f61595df3de2bbc1ce12b0f15740fbbacd6bfb8d88c21"
+        "chunk_hash": "71c8fe2f6f116f289f3f61595df3de2bbc1ce12b0f15740fbbacd6bfb8d88c21",
+        "replicas": [
+            {
+                "node": "node2",
+                "replica_path": "chunks\\node2\\testing_replica\\chunk_0000.bin"
+            }
+        ]
     },
     {
         "chunk_index": 1,
@@ -15,7 +21,13 @@
         "chunk_path": "chunks\\node2\\testing\\chunk_0001.bin",
         "node": "node2",
         "chunk_size": 1024,
-        "chunk_hash": "d66baea0ca0d3e5e355868a82ac7932e3904eb4f13b9c10168290f4af06e2fc9"
+        "chunk_hash": "d66baea0ca0d3e5e355868a82ac7932e3904eb4f13b9c10168290f4af06e2fc9",
+        "replicas": [
+            {
+                "node": "node1",
+                "replica_path": "chunks\\node1\\testing_replica\\chunk_0001.bin"
+            }
+        ]
     },
     {
         "chunk_index": 2,
@@ -24,7 +36,13 @@
         "chunk_path": "chunks\\node3\\testing\\chunk_0002.bin",
         "node": "node3",
         "chunk_size": 1024,
-        "chunk_hash": "67948b4b750a0d360c4810593ad1a4db79fa55b95a61f7e7476ef2d78a1c2b6b"
+        "chunk_hash": "67948b4b750a0d360c4810593ad1a4db79fa55b95a61f7e7476ef2d78a1c2b6b",
+        "replicas": [
+            {
+                "node": "node2",
+                "replica_path": "chunks\\node2\\testing_replica\\chunk_0002.bin"
+            }
+        ]
     },
     {
         "chunk_index": 3,
@@ -33,7 +51,13 @@
         "chunk_path": "chunks\\node1\\testing\\chunk_0003.bin",
         "node": "node1",
         "chunk_size": 1024,
-        "chunk_hash": "4777878d625c52fccf6fe0239c1faabb2f19623143a20d37dea6a650cf00ea20"
+        "chunk_hash": "4777878d625c52fccf6fe0239c1faabb2f19623143a20d37dea6a650cf00ea20",
+        "replicas": [
+            {
+                "node": "node2",
+                "replica_path": "chunks\\node2\\testing_replica\\chunk_0003.bin"
+            }
+        ]
     },
     {
         "chunk_index": 4,
@@ -42,7 +66,13 @@
         "chunk_path": "chunks\\node2\\testing\\chunk_0004.bin",
         "node": "node2",
         "chunk_size": 1024,
-        "chunk_hash": "86aef74dafa0b0aee6974287c45fba45def276af839acf903051cbd109ff633f"
+        "chunk_hash": "86aef74dafa0b0aee6974287c45fba45def276af839acf903051cbd109ff633f",
+        "replicas": [
+            {
+                "node": "node1",
+                "replica_path": "chunks\\node1\\testing_replica\\chunk_0004.bin"
+            }
+        ]
     },
     {
         "chunk_index": 5,
@@ -51,6 +81,12 @@
         "chunk_path": "chunks\\node3\\testing\\chunk_0005.bin",
         "node": "node3",
         "chunk_size": 773,
-        "chunk_hash": "0e8f6ae307ed1d4b97e2b2f0d40eb35323adf101fe476ab0b971f705396590f2"
+        "chunk_hash": "0e8f6ae307ed1d4b97e2b2f0d40eb35323adf101fe476ab0b971f705396590f2",
+        "replicas": [
+            {
+                "node": "node2",
+                "replica_path": "chunks\\node2\\testing_replica\\chunk_0005.bin"
+            }
+        ]
     }
 ]

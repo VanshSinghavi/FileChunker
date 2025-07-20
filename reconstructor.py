@@ -8,6 +8,21 @@ def verify_hash(data, expected_hash):
     h.update(data)
     return h.hexdigest() == expected_hash
 
+def try_read_valid_chunk(paths, expected_hash):
+    first = True
+    for path in paths:
+        if os.path.exists(path):
+            with open(path, 'rb') as f:
+                data = f.read()
+                if verify_hash(data, expected_hash):
+                    if not first:
+                        print(f"[INFO-LOG] Fallback chunk used: {path}, hash verified. Primary chunk may have been corrupted or missing.")
+                    return data
+                else:
+                    print(f"[ERROR-LOG] Chunk at {path} does not match expected hash. Skipping...")
+        first = False
+    return None
+
 def reconstruct_file(metadata_path):
     try:
         # Load metadata
@@ -25,26 +40,25 @@ def reconstruct_file(metadata_path):
             for chunk_info in sorted(meta_data, key=lambda x: x['chunk_index']):
                 chunk_hash = chunk_info['chunk_hash']
                 chunk_relative_path = chunk_info['relative_path']
-
+                chunk_filename = chunk_info['chunk_filename']
                 chunk_abs_path = os.path.join(CHUNK_DIR, chunk_relative_path)
 
-                if not os.path.exists(chunk_abs_path):
-                    print(f"[ERROR-LOG] Chunk file {chunk_abs_path} does not exist. Skipping...")
-                    continue
+                paths_to_try = [os.path.join(CHUNK_DIR, chunk_info['relative_path'])]
+                for replica_rel in chunk_info.get('replicas', []):
+                    paths_to_try.append(os.path.join(replica_rel['replica_path']))
 
-                with open(chunk_abs_path, 'rb') as chunk_file:
-                    chunk_data = chunk_file.read()
-                    if verify_hash(chunk_data, chunk_hash):
-                        reconstructed_file.write(chunk_data)
-                        print(f"[INFO-LOG] Successfully added chunk {chunk_info['chunk_filename']} to the reconstructed file.")
-                    else:
-                        print(f"[ERROR-LOG] Hash mismatch for chunk {chunk_info['chunk_filename']}. Skipping...")
-            
+                chunk_data = try_read_valid_chunk(paths_to_try, chunk_hash)
+                if chunk_data is None:
+                    print(f"[ERROR-LOG] Chunk {chunk_filename} with hash {chunk_hash} could not be found or is corrupted. Skipping...")
+                    continue
+                else:
+                    reconstructed_file.write(chunk_data)
+
         print(f"[INFO-LOG] Reconstructed file saved to {reconstructed_path} successfully.")
 
     except Exception as e:
         print(f"[ERROR-LOG] An error occurred during file reconstruction: {e}")
         raise e
 
-# # Example usage
-# reconstruct_file(os.path.join(CHUNK_DIR, 'testing_metadata.json'))
+# Example usage
+reconstruct_file(os.path.join(CHUNK_DIR, 'testing_metadata.json'))
