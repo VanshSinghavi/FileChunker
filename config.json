@@ -1,0 +1,9 @@
+{
+  "chunk_size": 1024, 
+  "chunk_dir": "chunks",
+  "reconstructed_dir": "reconstructed",
+  "storage_strategy": "local",
+  "filename_prefix": "chunk_",
+  "hash_algorithm": "sha256",
+  "nodes": ["node1", "node2", "node3"]
+}
